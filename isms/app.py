@@ -32,4 +32,4 @@ if __name__ == '__main__':
     app.register_blueprint(exam.mod)
     app.register_blueprint(information_setting.mod)
     app.register_blueprint(realtime_status.mod)
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='isms-system.herokuapp.com', debug=False)
