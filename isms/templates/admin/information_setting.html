@@ -1,0 +1,106 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+<div class="container form_create_question">
+    <h3>Information Settting</h3>
+    <hr/>
+    <div class="">
+        {% if detail %}
+        <form action="/setting/update/{{session.get('detail', None)}}" , method="post">
+        {% else %}
+            <form action="/setting" , method="post">
+            {% endif %}
+            <div class="form-group">
+                <label>Greeting</label>
+                <textarea class="form-control" id="greetingTextarea"
+                          rows="3" name="greeting" required>{% if detail %}{{ detail.greeting }}{% endif %}
+                </textarea>
+            </div>
+            <div class="form-group">
+                <label>Time</label>
+                <input type="text" name="dates"
+                       {% if detail %}
+                       value="{{start_time}} - {{end_time}}"
+                       {% endif %}
+                       class="form-control" required/>
+            </div>
+            <div class="form-group">
+                <label>Exam Time</label>
+                <input type="number" min="1" name="exam_time"
+                       {% if detail %}
+                       value="{{detail.exam_time}}"
+                       {% endif %}
+                       class="form-control" required/>
+            </div>
+            <div class="form-group">
+                <label>Structure of the exam</label>
+                <div class="form-group pl-5">
+                    <label>QMS</label>
+                    <div class="pl-5">
+                        <label>Number Of Questions</label>
+                        <input type="number" min="1" name="qms_total" onchange="set_max_qms_pass()" id="qms_total_id"
+                               class="form-control"
+                        {% if detail %}
+                        value="{{ detail.qms_total }}"
+                        {% endif %} required/>
+                    </div>
+                    <div class="pl-5">
+                        <label>Pass</label>
+                        <input type="number" min="1" name="qms_pass" class="form-control"
+                               {% if detail %}
+                                value="{{ detail.qms_pass }}"
+                               {% endif %}
+                               id="qms_pass_id" required/>
+                    </div>
+                </div>
+                <div class="form-group pl-5">
+                    <label>ISMS</label>
+                    <div class="pl-5">
+                        <label>Number Of Questions</label>
+                        <input type="number" min="1" name="isms_total" onchange="set_max_isms_pass()"
+                               class="form-control"
+                               {% if detail %}
+                                value="{{ detail.isms_total }}"
+                               {% endif %} required/>
+                    </div>
+                    <div class="pl-5">
+                        <label>Pass</label>
+                        <input type="number" min="1" name="isms_pass" id="isms_pass_id"
+                               {% if detail %}
+                                value="{{ detail.isms_pass }}"
+                               {% endif %}
+                               class="form-control" required/>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>List of contestants</label>
+                <textarea class="form-control" id="contestantsTextarea"
+                          rows="3" name="contestants" required>{{ emails }}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Documentation</label>
+                <textarea name="documentation" class="form-control" required>{{ detail.file }}</textarea>
+            </div>
+            <div class="button_form_create_question">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+<script type="text/javascript">
+    $('input[name="dates"]').daterangepicker();
+    function set_max_qms_pass(){
+        var el = document.getElementById("qms_pass_id");
+        let qms_total = $('input[name="qms_total"]').val();
+        el.max = qms_total;
+    }
+    function set_max_isms_pass(){
+        var el = document.getElementById("isms_pass_id");
+        let isms_total = $('input[name="isms_total"]').val();
+        el.max = isms_total;
+    }
+</script>
+{% endblock %}

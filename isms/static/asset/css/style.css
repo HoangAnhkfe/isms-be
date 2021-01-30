@@ -1,0 +1,126 @@
+.header_logo {
+  display: flex;
+  justify-content: center;
+}
+.header_title {
+  display: flex;
+  align-items: center;
+  background-color: #283593;
+  color: #ffffff;
+}
+.box_control {
+  text-align: right;
+}
+
+.box_control_button {
+  border: 1px solid red;
+  border-radius: 50%;
+  color: #ffffff;
+  background-color: red;
+  width: 35px;
+  height: 35px;
+}
+
+.box_control_button_infor{
+  border: 1px solid #707070;
+  border-radius: 50%;
+  color: #ffffff;
+  background-color: #39459b;
+  width: 45px;
+  height: 45px;
+}
+.sidebar {
+  display: flex;
+  margin-right: 0;
+  height: auto;
+  max-width: 310px;
+  border: 1px solid black;
+}
+.table_content {
+  border: 1px solid black;
+}
+.list-group-item {
+}
+.content {
+  padding-top: 30px;
+}
+.answer_list {
+  list-style-type: upper-alpha;
+}
+.delete_m_p{
+    margin: 0;
+    padding: 0;
+}
+.button_color {
+  background-color: #39459b;
+}
+.list-group-item.active {
+  color: black;
+  background-color: #edebf8;
+}
+.wrapper{
+    width: 800px;
+    height: 200px;
+    margin: 150px auto;
+}
+.admin_login{
+    width: 50%;
+    height: 50%;
+    margin: auto;
+}
+.form_create_question{
+    margin: 100px auto;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.button_form_create_question{
+    text-align: center;
+}
+.content_home{
+    margin-top: 50px;
+    border: 1px solid black;
+    padding: 20px;
+}
+.form_home{
+    margin: 50px auto;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 50px;
+}
+.button_vao_thi{
+    text-align: center;
+    padding-top: 10px;
+}
+.user_login{
+    border: 1px solid black;
+    padding: 40px;
+    border-radius: 5px;
+}
+.center_content{
+    text-align: center;
+}
+.left_body_exam{
+    width: 370px;
+}
+.style_a{
+ background-color: #4CAF4F;
+}
+.test{
+    color: #F44336 !important;
+}
+@media only screen and (max-width: 600px) {
+  body {
+    justify-content: center;
+  }
+}
+.fail_color{
+    background-color: #FDA5B5;
+}
+.pass_color{
+    background-color: #FFD27A;
+}
+
+.form__main {
+    display: flex;
+
+}

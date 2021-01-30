@@ -1,0 +1,1 @@
+env PYTHONPATH=isms python isms/app.py

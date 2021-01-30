@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container wrapper">
+    <div class="user_login">
+        <div class="button_form_create_question">
+            <h2>Thông Tin</h2>
+        </div>
+        <hr />
+        <form method="POST" action="" id="loginForm" >
+            <div class="form-group">
+                <label for="inputFullName">Họ và tên*</label>
+                <input type="text" class="form-control" id="inputFullName" placeholder="Full Name"
+                       name="full_name" required>
+            </div>
+            <div class="form-group">
+                <label for="inputEmail">Email*</label>
+                <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp"
+                       placeholder="Email" name="email" required>
+            </div>
+             <div class="form-group">
+                <label for="inputLab">Dự án/Lab/Bộ phận*</label>
+                 <select class="form-control" name="lab" id="selectLabId">
+                     {% for lab in labs %}
+                        <option value="{{lab.id}}">{{lab.name}}</option>
+                     {% endfor %}
+                 </select>
+            </div>
+            <div class="button_form_create_question">
+            <button type="button" id="btnSubmit" class="btn btn-primary" onclick="submit_login()">Làm bài</button>
+        </div>
+
+        </form>
+    </div>
+    <script  type="text/javascript">
+        function submit_login(){
+            let fullName = $('#inputFullName').val()
+            let email = $('#inputEmail').val()
+            let labId = $('#selectLabId').val()
+            $.ajax({
+                type: "POST",
+                url: "{{url_for('home.login',detail_id=detail_id)}}",
+                data:{
+                    full_name: fullName,
+                    email: email,
+                    lab: labId
+                },
+                success: function (data) {
+                let objData = JSON.parse(data);
+                    if(objData.status == true){
+                        window.location="/exam/"+objData.detail_id+"/"+objData.user_detail_id;
+                    }
+                    else{
+                        swal(objData.message, {
+                          icon: "warning",
+                        }).then(()=>{
+                            location.reload()
+                        });
+                    }
+                },
+                error: function (e) {
+                    swal(e.responseText);
+                }
+            })
+        }
+
+    </script>
+</div>
+{% endblock %}

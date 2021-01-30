@@ -1,0 +1,171 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+<div class="col-10 content">
+    <div class="content">
+        <div>
+            <nav class="navbar navbar-light bg-light justify-content-between">
+                <a class="navbar-brand"></a>
+                <form class="form-inline" action="" method="get">
+                    {% if request.args.get('search') %}
+                    <input class="form-control mr-sm-2" type="search" name="search" placeholder="Search"
+                           aria-label="Search" value="{{ request.args.get('search')}}">
+                    {% else %}
+                    <input class="form-control mr-sm-2" type="search" name="search" placeholder="Search"
+                           aria-label="Search" value="">
+                    {% endif %}
+
+                    <button class="btn btn-primary my-2 my-sm-0 mr-sm-3 button_color"
+                            type="submit">Search
+                    </button>
+
+                    <a class=" mr-sm-3" href="{{ url_for('question.create_question')}}">
+                        <button type="button" class="btn btn-primary button_color">+</button>
+                    </a>
+
+                    <button type="button" class="btn btn-primary button_color  mr-sm-3" data-toggle="modal"
+                            data-target="#upload_modal">Import
+                    </button>
+
+                    <a href="{{ url_for('question.export_question')}}">
+                        <button type="button" class="btn btn-primary button_color">Export</button>
+                    </a>
+                </form>
+            </nav>
+        </div>
+        <table class="table table-hover table_content">
+            <thead class="table_content">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Category</th>
+                <th scope="col">Content</th>
+                <th scope="col">Answer</th>
+                <th scope="col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for question in questions.items %}
+            <tr>
+                <th id="{{ question.id }}" onclick="Redirect(this)" scope="row">{{question.id}}</th>
+                <td id="{{ question.id }}" onclick="Redirect(this)">{{ question.category }}</td>
+                <td id="{{ question.id }}" onclick="Redirect(this)">
+                    {{ question.content }}
+                </td>
+                <td id="{{ question.id }}" onclick="Redirect(this)">
+                    <ul class="answer_list delete_m_p">
+                        {% for answer in question.answers %}
+                        {% if answer.is_correct %}
+                        <li class="text-success">{{ answer.content }}</li>
+                        {% else %}
+                        <li>{{ answer.content }}</li>
+                        {% endif %}
+
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger" id="{{question.id}}" onclick="delete_question(this)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class=pagination>
+            {%- for page_num in questions.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+            {% if page_num %}
+            {% if request.args.get('search') %}
+            {% if questions.page == page_num %}
+            <a class="btn btn-info mb-4"
+               href="{{ url_for('question.get_all_question', page=page_num, search=request.args.get('search'))}}">{{
+                page_num }}</a>
+            {% else %}
+            <a class="btn btn-outline-info mb-4"
+               href="{{ url_for('question.get_all_question', page=page_num, search=request.args.get('search'))}}">{{
+                page_num }}</a>
+            {% endif %}
+            {% else %}
+            {% if questions.page == page_num %}
+            <a class="btn btn-info mb-4" href="{{ url_for('question.get_all_question', page=page_num)}}">{{
+                page_num }}</a>
+            {% else %}
+            <a class="btn btn-outline-info mb-4" href="{{ url_for('question.get_all_question', page=page_num)}}">{{
+                page_num }}</a>
+            {% endif %}
+            {% endif %}
+
+            {% else %}
+            ...
+            {% endif %}
+            {%- endfor %}
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="upload_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="{{url_for('question.import_question')}}" method="POST"
+                  enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Import file question</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="file" name="file"/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    function Redirect(obj){
+        let question_id = obj.id;
+        window.location="/question/update/"+question_id;
+    }
+
+    function delete_question(obj){
+        let question_id = obj.id;
+        swal({
+          title: "Are you sure?",
+          text: "Once deleted, you will not be able to restore this object!",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            $.ajax({
+                type: "GET",
+                url: "/question/"+question_id,
+                success: function (data) {
+                    swal(data, {
+                      icon: "success",
+                    }).then(()=>{
+                        location.reload()
+                    });
+                },
+                error: function (e) {
+                    swal(e.responseText);
+                }
+            });
+          } else {
+          }
+        });
+    }
+
+
+
+
+
+</script>
+{% endblock %}

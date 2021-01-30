@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="ml-3 p-4 left_body_exam">
+    <div class="border border-dark p-3 " style="position: fixed; width: 300px;">
+        <div class="border border-dark center_content">
+            {% if result %}
+                <h1>Pass</h1>
+            {% else %}
+                <h1>Fail</h1>
+            {% endif %}
+            <h1 class="text-danger">{{true_total}}/{{ detail.qms_total + detail.isms_total }}</h1>
+        </div>
+        <div class="border border-dark mt-4 p-3">
+            <p>Thời gian hoàn thành: {{time}}</p>
+            <p>Số câu sai: {{ false_total}}</p>
+        </div>
+        <div class="center_content pt-2">
+            <button class="btn btn-success" onclick="exit()">Thoát</button>
+        </div>
+    </div>
+</div>
+<div class="col-md-8 p-4 ml-3">
+    {% for item in list_question %}
+    {% if item.status == False %}
+    <div class="border border-dark d-flex p-2 mt-2 row">
+        <div class="col-12">
+            <p class="text-danger test">{{loop.index}}. {{item.Question.content}}</p>
+        </div>
+        <div class="w-100">
+            <ul class="answer_list w-100">
+                {% for item_answer in item.Question.answers %}
+                 <div
+                        {% if item_answer.is_correct %}
+                        class="style_a w-100"
+                        {% endif %}
+                >
+                <input class="form-check-input" type="radio"
+                       value="{{item_answer.id}}" name="{{item.id}}"
+                       onclick="answer(this)"
+                       {% if item.answer_id== item_answer.id %}
+                       checked
+                       {% endif %}
+                >
+                <li class="ml-4">{{item_answer.content}}</li>
+                </div>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% for item in list_question %}
+    {% if item.status == True %}
+    <div class="border border-dark d-flex p-2 mt-2 row">
+        <div class="col-12">
+            <p class="text-success">{{loop.index}}. {{item.Question.content}}</p>
+        </div>
+        <div>
+            <ul class="answer_list">
+                {% for item_answer in item.Question.answers %}
+                    <input class="form-check-input" type="radio"
+                       value="{{item_answer.id}}" name="{{item.id}}"
+                       onclick="answer(this)"
+                       {% if item.answer_id== item_answer.id %}
+                       checked
+                       {% endif %}
+                    >
+                    <li class="ml-4">{{item_answer.content}}</li>
+
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+    {% endif %}
+    {% endfor %}
+
+</div>
+<script type="text/javascript">
+    function exit(){
+        window.location.href="/";
+    }
+
+
+</script>
+{% endblock %}

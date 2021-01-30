@@ -1,0 +1,90 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+<div class="container form_create_question">
+    <h3>Create Question</h3>
+    <hr/>
+    <div class="">
+        <form action="/question/create", method="post" onsubmit="return submit_form()">
+            <div class="form-group">
+                <label for="exampleFormControlTextarea1">Question</label>
+                <textarea class="form-control" id="exampleFormControlTextarea1"
+                          rows="3" name="content_question" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Category</label>
+                <select class="form-control" id="exampleFormControlSelect1" name="category">
+                    <option>QMS</option>
+                    <option>ISMS</option>
+                </select>
+            </div>
+            <div class="form-group" id="group_answer">
+                <div class="form_answer" id="form_answer1">
+                    <label for="formGroupExampleInput">Answer option</label>
+                    <div class="row px-5">
+                        <input class="form-check-input" type="radio" id="checkbox_answer1"
+                               value="option1" name="is_correct">
+                        <input type="text" class="form-control col-md-11 mr-2" id="inputAnswer1" name="content_answer" required>
+                        <input type="button" class="box_control_button" onclick="reply_click()" id="1"
+                               value="-"></input>
+                    </div>
+                </div>
+
+            </div>
+            <div class="button_form_create_question">
+                <textarea class="form-control d-none" id="textarea1" rows="3" name="answers"></textarea>
+                <button type="button" class="btn btn-primary " id="add_answer">Add answer
+                    option
+                </button>
+                <br/>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+<script type="text/javascript">
+    let i = 1;
+    const button = document.getElementById("add_answer");
+    let list_answer = [1]
+    button.onclick=function(){
+       i++;
+       if(list_answer.length < {{limit_choice}})
+       {
+            list_answer.push(i);
+            jQuery('#group_answer').append('<div class="form_answer" id="form_answer'+ i +'"> <label for="formGroupExampleInput">Answer option</label><div class="row px-5"><input class="form-check-input" type="radio" name="is_correct" id="checkbox_answer'+ i
+            +'"value="option'+ i +'"><input type="text" class="form-control col-md-11 mr-2" id="inputAnswer'+i+'" name="content_answer" required>'+
+            '<input type="button" class="box_control_button" onclick="reply_click()" id="'+ i +'" value="-"></input></div></div>');
+       }
+    };
+    function reply_click()
+    {
+        const id = event.srcElement.id;
+        const form = document.getElementById("form_answer"+id);
+        form.remove();
+        list_answer.pop(id);
+    }
+    function submit_form() {
+        var answers = []
+            for(const item of list_answer)
+            {
+                let is_correct = false;
+                const check_answer = document.getElementById("checkbox_answer"+item);
+                if(check_answer.checked === true)
+                {
+                    is_correct = true;
+                }
+                const content_answer = document.getElementById("inputAnswer"+item).value    ;
+                const answer =
+                {
+                    is_correct: is_correct,
+                    content: content_answer
+                }
+                answers.push(answer);
+            }
+            jQuery('#textarea1').val(JSON.stringify(answers));
+            return true;
+    };
+</script>
+{% endblock %}

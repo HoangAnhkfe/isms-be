@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container form_home">
+    <div class="button_form_create_question">
+        <h2>ĐÀO TẠO CHẤT LƯỢNG & AN NINH THÔNG TIN (QMS & ISMS)</h2>
+    </div>
+    <hr/>
+    {% if detail %}
+    <div class="content_home">
+        <p>
+            {{ detail.greeting }}
+        </p>
+        <p>
+            <b>Thời gian bắt đầu:</b> {{ start_time }}
+        </p>
+        <p>
+            <b>Thời gian kết thúc:</b> {{ end_time }}
+        </p>
+        <p>
+            <b>Số lượng câu hỏi:</b> {{ detail.qms_total + detail.isms_total }} câu
+        </p>
+        <p>
+            <b>Tiêu chí đạt:</b>
+            <p class="pl-5"><b>QMS:</b> {{ detail.qms_pass }}/{{ detail.qms_total }}</p>
+            <p class="pl-5"><b>ISMS:</b> {{ detail.isms_pass }}/{{ detail.isms_total }}</p>
+        </p>
+        <p>
+            <b>Tài liệu tham khảo:</b>
+            <br/>
+            <span>
+            {% for item in file_arr %}
+                 <a class="pl-5" href="{{ detail.file }}" target="_blank">{{ item }}</a>
+            {% endfor %}
+            </span>
+
+        </p>
+    </div>
+    <div class="button_vao_thi">
+        <a href="/home/login/{{ detail.id }}"><button type="button" class="btn btn-primary" id="myBtn">Vào Thi</button></a>
+    </div>
+    {% else %}
+    <div class="button_form_create_question">
+            <h2>Hiện không có kỳ thi nào</h2>
+        </div>
+    {% endif %}
+
+</div>
+<script type="text/javascript">
+    {% if start_time %}
+    var date_now = Date.now();
+    var start_time = new Date('{{ start_time }}');
+    if( start_time > date_now ){
+        document.getElementById("myBtn").disabled = true;
+    }
+    {% endif %}
+</script>
+{% endblock %}

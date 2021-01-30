@@ -1,0 +1,61 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+<div class="container wrapper">
+    <div class="admin_login">
+        <form method="POST" id="loginForm" >
+            <div class="form-group">
+                <label for="inputEmail">Email address</label>
+                <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp"
+                       placeholder="Enter email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword">Password</label>
+                <input type="password" class="form-control" id="inputPassword" placeholder="Password"
+                       name="password" required>
+            </div>
+            <button type="submit" id="btnSubmit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+    <script  type="text/javascript">
+        $(document).ready(function () {
+
+        $("#btnSubmit").click(function (event) {
+
+            //stop submit the form, we will post it manually.
+            event.preventDefault();
+
+            // Get form
+            var form = $('#loginForm')[0];
+
+           // Create an FormData object
+            var data = new FormData(form);
+
+           // disabled the submit button
+            $("#btnSubmit").prop("disabled", true);
+
+            $.ajax({
+                type: "POST",
+                enctype: 'multipart/form-data',
+                url: "/admin/login",
+                data: data,
+                processData: false,
+                contentType: false,
+                cache: false,
+                timeout: 800000,
+                success: function (data) {
+                    window.location.href="/question";
+
+                },
+                error: function (e) {
+                    alert(e.responseText);
+                }
+            });
+            $("#btnSubmit").prop("disabled", false);
+
+        });
+
+    });
+    </script>
+</div>
+{% endblock %}

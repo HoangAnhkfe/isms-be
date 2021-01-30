@@ -1,0 +1,222 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+<div class="col-10 content">
+    <div>
+        <nav class="navbar navbar-light bg-light justify-content-between">
+                <a class="navbar-brand"></a>
+                <form class="form-inline" action="" method="get">
+                    {% if request.args.get('search') %}
+                    <input class="form-control mr-sm-2" type="search" name="search" placeholder="Search"
+                           aria-label="Search" value="{{ request.args.get('search')}}">
+                    {% else %}
+                    <input class="form-control mr-sm-2" type="search" name="search" placeholder="Search"
+                           aria-label="Search" value="">
+                    {% endif %}
+
+                    <button class="btn btn-primary my-2 my-sm-0 mr-sm-3 button_color"
+                            type="submit">Search
+                    </button>
+                    <a href="/realtime_status/export/{{name_url}}/{{session.get('detail', None)}}">
+                         <button class="btn btn-primary my-2 my-sm-0 mr-sm-3 button_color" type="button">
+                             Export
+                         </button>
+                    </a>
+                </form>
+
+
+            </nav>
+    </div>
+    <div class="content .center_content">
+        <div>
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link
+        {% if name_url == 'exclude' %}
+            active
+        {% endif %}
+        " href="/realtime_status/exclude/{{session.get('detail', None)}}">Exclude</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link
+        {% if name_url == 'uncategorized' %}
+            active
+        {% endif %}
+        " href="/realtime_status/uncategorized/{{session.get('detail', None)}}">Uncategorized</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link
+        {% if name_url == 'fail' %}
+            active
+        {% endif %}
+        " href="/realtime_status/fail/{{session.get('detail', None)}}">Fail</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link
+        {% if name_url == 'pass' %}
+            active
+        {% endif %}
+        " href="/realtime_status/pass/{{session.get('detail', None)}}">Pass</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                    <table class="table table-hover ss">
+                        <thead >
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Start Time</th>
+                            <th scope="col">Exam Time</th>
+                            <th scope="col">Result</th>
+                            <th scope="col">QMS</th>
+                            <th scope="col">ISMS</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in list_user_result %}
+                        <tr
+                                {% if not item.status %}
+                                class="fail_color"
+                                {% else %}
+                                class="pass_color"
+                                {% endif %}
+                                id="{{ item.user_detail.id }}" onclick="show_modal(this)" data-toggle="modal" data-target="#myModal">
+                            <th scope="row">{{loop.index}}</th>
+                            <td id="email{{item.user_detail.id}}">{{ item.email }}</td>
+                            <td>
+                                {% if item.user_detail.start_time %}
+                                {{ item.user_detail.start_time}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.user_detail.start_time %}
+                                {{ item.user_detail.end_time - item.user_detail.start_time}}
+                                {% endif %}
+                            </td>
+                            <td>
+
+                                {{ item.qms_total + item.isms_total }}/{{detail.qms_total+detail.isms_total}}
+
+                            </td>
+                            <td>
+
+                                {{ item.qms_total}}/{{detail.qms_pass}}
+
+                            </td>
+                            <td>
+
+                                {{ item.isms_total}}/{{detail.isms_pass}}
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class=pagination>
+                        {%- for page_num in list_user_result_pagination.iter_pages(left_edge=1, right_edge=1,
+                        left_current=1, right_current=2) %}
+                        {% if page_num %}
+                        {% if request.args.get('search') %}
+                        {% if list_user_result_pagination.page == page_num %}
+                        <a class="btn btn-info mb-4"
+                           href="/realtime_status/{{name_url}}/{{detail.id}}/?search={{request.args.get('search')}}&page={{page_num}}">{{
+                            page_num }}</a>
+                        {% else %}
+                        <a class="btn btn-outline-info mb-4"
+                           href="/realtime_status/{{name_url}}/{{detail.id}}/?search={{request.args.get('search')}}&page={{page_num}}">{{
+                            page_num }}</a>
+                        {% endif %}
+                        {% else %}
+                        {% if list_user_result_pagination.page == page_num %}
+                        <a class="btn btn-info mb-4"
+                           href="/realtime_status/{{name_url}}/{{detail.id}}/?page={{page_num}}">{{
+                            page_num }}</a>
+                        {% else %}
+                        <a class="btn btn-outline-info mb-4"
+                           href="/realtime_status/{{name_url}}/{{detail.id}}/?page={{page_num}}">{{
+                            page_num }}</a>
+                        {% endif %}
+                        {% endif %}
+
+                        {% else %}
+                        ...
+                        {% endif %}
+                        {%- endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container mt-3">
+    <!-- The Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Update user quiz results</h4>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <input type="text" class="form-control" hidden name="detail_id" id="modal_id"></input>
+                    <div class="center_content">
+                        <input class="form-control" type="text" disabled id="modal_email" name="email"
+                                                       class="center_content" style="text-align: center;"></input>
+                    </div>
+                    <div class="p-3">
+                        <h5>Status*</h5>
+                        <select id="modal_status" class="form-control" name="status">
+                            <option value="1">True</option>
+                            <option value="0">False</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="submit_modal()">Save changes</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    function show_modal(obj){
+        let id = obj.id;
+        email = document.getElementById("email"+id).innerHTML;
+        $("#modal_id").val(obj.id);
+        $("#modal_email").val(email);
+        $("#myModal").on('shown.bs.modal', function (e) {
+        });
+
+    }
+
+    function submit_modal(){
+        let id = $("#modal_id").val();
+        let email = $("#modal_email").val();
+        let status = $("#modal_status").val();
+        $.ajax({
+            type: 'POST',
+            data: {
+                status: status,
+                email: email
+            },
+            url: '/realtime_status/{{detail.id}}/submit/'+id,
+            success: function (data) {
+                    location.reload()
+            },
+            error: function (e) {
+                    alert(e.responseText);
+            }
+        })
+    }
+</script>
+{% endblock %}

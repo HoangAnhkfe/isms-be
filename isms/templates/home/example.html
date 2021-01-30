@@ -1,0 +1,195 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<form class="form__main">
+    <div class="ml-3 p-4 left_body_exam">
+        <div class="border border-dark p-3" style="position: fixed; width: 300px;">
+            <div class="border border-dark center_content">
+                <h4 class="text-primary">Thời gian còn lại</h4>
+                <h1 class="text-danger"><span id="h">00</span>:<span id="m">15</span>:<span id="s">00</span></h1>
+            </div>
+            <div class="border border-dark mt-4 p-3">
+                <p>Số câu: {{ detail.qms_total + detail.isms_total }}</p>
+                <p>
+                    Tiêu chí đạt:
+                <div class="pl-5">
+                    <p>QMS: {{ detail.qms_pass}}/{{ detail.qms_total}}</p>
+                    <p>ISMS: {{ detail.isms_pass}}/{{ detail.isms_total}}</p>
+                </div>
+                </p>
+            </div>
+            <div class="center_content pt-2">
+                <button class="btn btn-success" type="button" onclick="submit_exam()">Nộp Bài</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 p-4 ml-3">
+        <div class="border border-dark d-flex p-2 row font-weight-bold">
+            Loại câu hỏi về chất lượng (QMS)
+        </div>
+        {% for item_qms in list_question %}
+
+        {% if item_qms.Question.category == category_type.QMS_Category.value %}
+        <div class="border border-dark d-flex p-2 mt-2 row">
+            <div class="col-12">
+                <p>{{loop.index}}. {{item_qms.Question.content}}</p>
+            </div>
+            <div>
+                <ul class="answer_list">
+                    {% for item_answer in item_qms.Question.answers %}
+                    <input class="form-check-input" type="radio" value="{{item_answer.id}}"
+                        id="item_answer-{{item_answer.id}}" name="{{item_qms.id}}" onclick="answer(this)" {% if
+                        item_qms.answer_id==item_answer.id %} checked {% endif %}>
+                    <li class="ml-4">{{item_answer.content}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+        {% endif %}
+        {% endfor %}
+        <div class="border border-dark d-flex p-2 mt-2 row font-weight-bold">
+            Loại câu hỏi về An ninh thông tin (ISMS)
+        </div>
+        {% for item_isms in list_question %}
+        {% if item_isms.Question.category == category_type.ISMS_Category.value %}
+        <div class="border border-dark d-flex p-2 mt-2 row">
+            <div class="col-12">
+                <p>{{loop.index}}. {{item_isms.Question.content}}</p>
+            </div>
+            <div>
+                <ul class="answer_list">
+                    {% for item_answer in item_isms.Question.answers %}
+                    <input class="form-check-input" type="radio" value="{{item_answer.id}}" name="{{item_isms.id}}"
+                        id="item_answer-{{item_answer.id}}" onclick="answer(this)" {% if
+                        item_isms.answer_id==item_answer.id %} checked {% endif %}>
+                    <li class="ml-4">{{item_answer.content}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+        {% endif %}
+        {% endfor %}
+
+    </div>
+</form>
+<script type="text/javascript">
+    var current_date = new Date();
+    var start_time = new Date('{{start_time}}');
+    var exam_time = 60000 * {{ detail.exam_time }}
+    var remaining_time = new Date(exam_time - (current_date - start_time));
+    console.log(2400000 - (current_date - start_time))
+    console.log(remaining_time)
+    var h = 0; // Giờ
+    var m = 15; // Phút
+    var s = 0; // Giây
+    if ((remaining_time.getFullYear() - 1970 === 0) && (remaining_time.getMonth() === 0) && (remaining_time.getDate() - 1 == 0)) {
+        h = remaining_time.getHours() - 7;
+        m = remaining_time.getMinutes();
+        s = remaining_time.getSeconds();
+    }
+    var timeout = null; // Timeout
+    function start() {
+        /*BƯỚC 1: CHUYỂN ĐỔI DỮ LIỆU*/
+        // Nếu số giây = -1 tức là đã chạy ngược hết số giây, lúc này:
+        //  - giảm số phút xuống 1 đơn vị
+        //  - thiết lập số giây lại 59
+        if (s === -1) {
+            m -= 1;
+            s = 59;
+        }
+
+        // Nếu số phút = -1 tức là đã chạy ngược hết số phút, lúc này:
+        //  - giảm số giờ xuống 1 đơn vị
+        //  - thiết lập số phút lại 59
+        if (m === -1) {
+            h -= 1;
+            m = 59;
+        }
+
+        // Nếu số giờ = -1 tức là đã hết giờ, lúc này:
+        //  - Dừng chương trình
+        if (h == -1) {
+            clearTimeout(timeout);
+            alert('Hết giờ');
+            submit_exam_ajax();
+        }
+
+        /*BƯỚC 1: HIỂN THỊ ĐỒNG HỒ*/
+        document.getElementById('h').innerText = h.toString();
+        document.getElementById('m').innerText = m.toString();
+        document.getElementById('s').innerText = s.toString();
+
+        /*BƯỚC 1: GIẢM PHÚT XUỐNG 1 GIÂY VÀ GỌI LẠI SAU 1 GIÂY */
+        timeout = setTimeout(function () {
+            s--;
+            start();
+        }, 1000);
+    }
+    function answer(obj) {
+        let el = document.getElementById(`${obj.id}`);
+        const att = document.createAttribute("checked");
+        att.value = "checked";
+        el.setAttributeNode(att);
+        user_question_id = obj.name;
+        answer_id = obj.value;
+        $.ajax({
+            type: 'POST',
+            data: {
+                answer_id: answer_id
+            },
+            url: '/exam/{{user_detail.id}}/answer/' + user_question_id,
+            success: function (data) {
+                console.log(data)
+
+            },
+            error: function (e) {
+                alert(e.responseText);
+            }
+        })
+    }
+    function submit_exam() {
+        const input = document.querySelectorAll('.answer_list input.form-check-input');
+        const checkedInputCount = Array.from(input).filter(i => i.checked).length;
+        console.log(checkedInputCount);
+        let totalQuestion = {{ detail.qms_total + detail.isms_total }};
+        if (checkedInputCount < totalQuestion) {
+            let countQuestion = totalQuestion - checkedInputCount;
+            swal({
+                title: "Are you sure?",
+                text: "Bạn còn " + countQuestion + " câu chưa làm, bạn có chắc chắn muốn nộp bài không?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        submit_exam_ajax()
+                    } else {
+
+                    }
+                });
+        }
+        else {
+            submit_exam_ajax()
+        }
+    }
+
+    function submit_exam_ajax() {
+        $.ajax({
+            type: 'POST',
+            url: '/exam/{{detail.id}}/submit/{{user_detail.id}}',
+            success: function (data) {
+                window.location.href = "/exam/{{detail.id}}/result/{{user_detail.id}}";
+            },
+            error: function (e) {
+                alert(e.responseText);
+            }
+        })
+    }
+
+
+</script>
+{% endblock %}
