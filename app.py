@@ -12,6 +12,11 @@ logger = getLogger(__name__)
 app = Flask(__name__, static_folder='./static')
 
 
+@app.route('/helloworld')
+def hello_world():
+    return 'Hello World'
+
+
 @app.route('/')
 def auth():
     return redirect(IsmsRouter.HOME.value)
